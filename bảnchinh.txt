@@ -1,0 +1,34 @@
+import excel "C:\Users\ADMIN\OneDrive\Documents\Phương pháp nghiên cứu\DATAB1BANCUOI(1).xlsx", sheet("Sheet1") firstrow clear
+recast str Country
+encode Country, gen (region)
+xtset INF Year
+tsset INF Year
+sum
+corr
+reg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN
+vif
+hettest
+xtset Year
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN,fe
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN,re
+est store fe
+est store re
+*kiểm định hausman
+hausman fe re,sigmamore
+*chạy pt fe(robust)
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN,robust fe
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN,robust re
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN, re vce(cluster Year)
+xtreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN, fe vce(cluster Year)
+est store fix
+est store random
+help rhausman
+rhausman fix random, cluster
+rhausman random fix , cluster
+*pt fe(driscoll)
+xtset INF Year
+tsset INF Year
+xtscc FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN,fe
+*tìm lp ngưỡng
+ help xthreg
+xthreg FDI UNE INF GROW GDP EXCH OD REM CAB CRED OPEN, rx(FDI) qx(INF)
